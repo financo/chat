@@ -5,6 +5,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
+import java.net.Socket;
 
 public class ChatClient extends Frame{
 	
@@ -31,6 +33,16 @@ public class ChatClient extends Frame{
 		});
 		tfTxt.addActionListener(new TFListener());
 		setVisible(true);
+		connect();
+	}
+	
+	public void connect() {
+		try {
+			Socket s = new Socket("127.0.0.1", 8888);
+System.out.println("connected");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	private class TFListener implements ActionListener{
