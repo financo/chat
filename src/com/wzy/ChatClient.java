@@ -5,14 +5,18 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
 public class ChatClient extends Frame{
 	
-	Socket s ;
-	DataOutputStream dos;
+	Socket s = null;
+	DataOutputStream dos = null;
+	DataInputStream dis = null;
+	private boolean bConnected = false;
+	
 	TextField tfTxt = new TextField();
 	TextArea taContent = new TextArea();
 	
@@ -38,13 +42,17 @@ public class ChatClient extends Frame{
 		tfTxt.addActionListener(new TFListener());
 		setVisible(true);
 		connect();
+		
+		new Thread(new Receive()).start();
 	}
 	
 	public void connect() {
 		try {
 			s = new Socket("127.0.0.1", 8888);
 			dos = new DataOutputStream(s.getOutputStream());
+			dis= new DataInputStream(s.getInputStream());
 System.out.println("connected");
+			bConnected = true;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -64,7 +72,7 @@ System.out.println("connected");
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			String str = tfTxt.getText().trim();
-			taContent.setText(str);
+//			taContent.setText(str);
 			tfTxt.setText("");
 			try {
 				dos.writeUTF(str);
@@ -72,6 +80,23 @@ System.out.println("connected");
 				//dos.close();
 			} catch (IOException e1) {
 				e1.printStackTrace();
+			}
+		}
+		
+	}
+
+	private class Receive implements Runnable{
+
+		@Override
+		public void run() {
+			try {
+				while (bConnected) {
+					String str = dis.readUTF();
+//					System.out.println(str);
+					taContent.setText(taContent.getText() + str +"\n");
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		}
 		
