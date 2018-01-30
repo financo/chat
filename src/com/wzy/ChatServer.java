@@ -6,15 +6,22 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ChatServer {
+	
 	public static void main(String[] args) {
+		boolean started = false;
 		try {
 			ServerSocket ss = new ServerSocket(8888);
-			while(true) {
+			started = true;
+			while(started) {
+				boolean bConnected = false;
 				Socket s = ss.accept();
 System.out.println("a client connected!");
+				bConnected = true;
 				DataInputStream dis = new DataInputStream(s.getInputStream());
-				String str = dis.readUTF();
-				System.out.println(str);
+				while(bConnected) {
+					String str = dis.readUTF();
+					System.out.println(str);
+				}
 				dis.close();
 			}
 		} catch (IOException e) {
