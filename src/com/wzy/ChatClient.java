@@ -5,11 +5,13 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 
 public class ChatClient extends Frame{
 	
+	Socket s ;
 	TextField tfTxt = new TextField();
 	TextArea taContent = new TextArea();
 	
@@ -38,7 +40,7 @@ public class ChatClient extends Frame{
 	
 	public void connect() {
 		try {
-			Socket s = new Socket("127.0.0.1", 8888);
+			s = new Socket("127.0.0.1", 8888);
 System.out.println("connected");
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -49,9 +51,17 @@ System.out.println("connected");
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			String s = tfTxt.getText().trim();
-			taContent.setText(s);
+			String str = tfTxt.getText().trim();
+			taContent.setText(str);
 			tfTxt.setText("");
+			try {
+				DataOutputStream dos = new DataOutputStream(s.getOutputStream());
+				dos.writeUTF(str);
+				dos.flush();
+				dos.close();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 		
 	}
