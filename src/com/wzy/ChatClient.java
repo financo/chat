@@ -9,6 +9,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class ChatClient extends Frame{
 	
@@ -19,6 +20,8 @@ public class ChatClient extends Frame{
 	
 	TextField tfTxt = new TextField();
 	TextArea taContent = new TextArea();
+	
+	Thread tRecv = new Thread(new Receive());
 	
 	public static void main(String[] args) {
 		new ChatClient().launchFrame();
@@ -43,7 +46,7 @@ public class ChatClient extends Frame{
 		setVisible(true);
 		connect();
 		
-		new Thread(new Receive()).start();
+		tRecv.start();
 	}
 	
 	public void connect() {
@@ -59,12 +62,29 @@ System.out.println("connected");
 	}
 	
 	public void disconnected() {
+		
 		try {
 			dos.close();
+			dis.close();
 			s.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		/*try {
+			bConnected = false;
+			tRecv.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}finally {
+			try {
+				dos.close();
+				dis.close();
+				s.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}*/
 	}
 	
 	private class TFListener implements ActionListener{
@@ -95,6 +115,8 @@ System.out.println("connected");
 //					System.out.println(str);
 					taContent.setText(taContent.getText() + str +"\n");
 				}
+			} catch (SocketException e) {
+				System.out.println("推出了，byebye!");
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
